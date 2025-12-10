@@ -1152,7 +1152,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   // ===========================================================================
   const submitCvReview = document.getElementById("submitCvReview");
   if (submitCvReview) {
-    submitCvReview.addEventListener("click", () => {
+    submitCvReview.addEventListener("click", async () => {
       // Save current tab edits back into modal state
       syncActiveCvFromDom();
       const allResults = deepClone(modalCvData);
@@ -1185,7 +1185,55 @@ document.addEventListener("DOMContentLoaded", async () => {
         console.log('✅ Modal closed');
       }
 
-      // Keep recommendations visible - don't clear them when reviewing CVs
+      // Regenerate recommendations with updated CV data
+      if (submittedCvData.length > 0) {
+        try {
+          showLoading(rulesStatus, "generating");
+          
+          // Get current rules from UI
+          const rules = getRulesFromUI();
+          
+          if (rules.length > 0) {
+            const rulesText = rules.join("\n");
+            userRules = await parseAndApplyRules(rulesText);
+            saveUserRules(userRules);
+          } else {
+            userRules = [];
+            saveUserRules(userRules);
+            console.log("📝 No rules provided - AI will use its own reasoning");
+          }
+
+          // Normalize submitted CV data for recommendations
+          const cvArrayForRec = normalizeCvArray(submittedCvData);
+
+          if (cvArrayForRec && cvArrayForRec.length > 0) {
+            // Generate recommendations with updated CV data
+            const recommendations = await analyzeCvsWithAI(cvArrayForRec, userRules, currentLang);
+
+            // Merge and display recommendations (matching by CV index)
+            applyRecommendationsToUi(recommendations, cvArrayForRec);
+
+            updateStatus(rulesStatus, "genSuccess");
+            
+            // Scroll to results
+            setTimeout(() => {
+              if (resultsSection) {
+                resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                console.log('✅ Scrolled to recommendations section');
+              }
+            }, 300);
+          }
+        } catch (err) {
+          console.error("Regeneration Error:", err);
+          updateStatus(
+            rulesStatus,
+            `Failed to regenerate recommendations. Error: ${err.message}`,
+            true
+          );
+        } finally {
+          hideLoading(rulesStatus);
+        }
+      }
     });
   }
 });
