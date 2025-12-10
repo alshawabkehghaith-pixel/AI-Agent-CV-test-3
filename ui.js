@@ -1187,9 +1187,13 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       // Regenerate recommendations with updated CV data
       if (submittedCvData.length > 0) {
+        // Use the Generate Recommendations button loading animation
+        const generateBtn = document.getElementById("generate-recommendations-btn");
+        if (generateBtn) {
+          setButtonLoading(generateBtn, true);
+        }
+        
         try {
-          showLoading(rulesStatus, "generating");
-          
           // Get current rules from UI
           const rules = getRulesFromUI();
           
@@ -1231,7 +1235,9 @@ document.addEventListener("DOMContentLoaded", async () => {
             true
           );
         } finally {
-          hideLoading(rulesStatus);
+          if (generateBtn) {
+            setButtonLoading(generateBtn, false);
+          }
         }
       }
     });
