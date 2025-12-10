@@ -176,14 +176,18 @@ function getRulesFromUI() {
 
 function updateGenerateButton(uploadedCvs) {
   const generateBtn = document.getElementById("generate-recommendations-btn");
+  const fileInput = document.getElementById("file-input");
   if (generateBtn) {
-    generateBtn.disabled = uploadedCvs.length === 0;
+    // Enable if files are selected OR if there are uploaded CVs
+    const hasFiles = fileInput && fileInput.files && fileInput.files.length > 0;
+    const hasCvs = uploadedCvs.length > 0;
+    generateBtn.disabled = !hasFiles && !hasCvs;
   }
 }
 
 // Alias for consistency with test folder naming
-function updateStartRecommendingButton(uploadedCvs) {
-  updateGenerateButton(uploadedCvs);
+function updateStartRecommendingButton(uploadedCvs, submittedCvDataParam) {
+  updateGenerateButton(uploadedCvs, submittedCvDataParam);
 }
 
 // ---------------------------------------------------------------------------
@@ -889,12 +893,18 @@ document.addEventListener("DOMContentLoaded", async () => {
           uploadStatus,
           `Selected ${files.length} file(s): ${files.map((f) => f.name).join(", ")}`
         );
+        // Enable button when files are selected (button will analyze on click)
+        const generateBtn = document.getElementById("generate-recommendations-btn");
+        if (generateBtn) {
+          generateBtn.disabled = false;
+        }
       } else if (uploadStatus) {
         uploadStatus.innerHTML = "";
         // File input cleared - clear last processed names
         lastProcessedFileNames = [];
+        // Disable button if no files and no submitted CVs
+        updateGenerateButton(uploadedCvs);
       }
-      updateGenerateButton(uploadedCvs);
     });
   }
 
@@ -1160,7 +1170,13 @@ document.addEventListener("DOMContentLoaded", async () => {
       uploadedCvs = [];
       // Keep lastProcessedFileNames to prevent reprocessing same files
       // They will be cleared when new files are selected
-      updateGenerateButton(uploadedCvs);
+      // Button should stay enabled since we have submitted CVs
+      const generateBtn = document.getElementById("generate-recommendations-btn");
+      if (generateBtn && submittedCvData.length > 0) {
+        generateBtn.disabled = false;
+      } else {
+        updateGenerateButton(uploadedCvs);
+      }
 
       // INTEGRATED: Close modal
       const modal = document.getElementById("cvModal");
