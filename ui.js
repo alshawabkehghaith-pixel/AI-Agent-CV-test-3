@@ -159,6 +159,23 @@ function initializeRulesUI(rules) {
   }
 }
 
+function removeEmptyRuleInputs() {
+  const container = document.getElementById("rules-container");
+  if (!container) return;
+
+  const inputs = container.querySelectorAll(".rule-input");
+  inputs.forEach((input) => {
+    const value = input.value.trim();
+    if (!value) {
+      // Find the parent wrapper and remove it
+      const wrapper = input.closest(".rule-input-wrapper");
+      if (wrapper) {
+        wrapper.remove();
+      }
+    }
+  });
+}
+
 function getRulesFromUI() {
   const container = document.getElementById("rules-container");
   if (!container) return [];
@@ -1096,6 +1113,9 @@ document.addEventListener("DOMContentLoaded", async () => {
           return;
         }
       }
+
+      // Remove empty rule inputs before processing
+      removeEmptyRuleInputs();
 
       // Get current rules from UI (always use fresh UI state)
       const rules = getRulesFromUI();
