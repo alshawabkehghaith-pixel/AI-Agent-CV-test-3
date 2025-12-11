@@ -270,6 +270,22 @@ function downloadRecommendationsAsPDF(recommendations, language = 'en') {
     pdfHTML += '</div>';
   });
   
+  // Add footer with date
+  const currentDate = new Date().toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+  const generatedText = language === 'ar' ? 'تم الإنشاء في' : 'Generated on';
+  
+  pdfHTML += `
+    <div class="pdf-footer">
+      <div class="pdf-footer-content">
+        <div>${generatedText} ${currentDate}</div>
+      </div>
+    </div>
+  `;
+  
   pdfHTML += '</div>';
   
   // Create a temporary container
