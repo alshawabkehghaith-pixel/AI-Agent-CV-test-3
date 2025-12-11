@@ -177,6 +177,23 @@ function removeEmptyRuleInputs() {
   });
 }
 
+function updateDownloadButtonVisibility(recommendations) {
+  const downloadBtn = document.getElementById("download-recommendations-btn");
+  if (!downloadBtn) return;
+
+  // Hide button if no recommendations or empty candidates array
+  if (
+    !recommendations ||
+    !recommendations.candidates ||
+    recommendations.candidates.length === 0
+  ) {
+    downloadBtn.classList.add("hidden");
+  } else {
+    // Show button only if there are valid candidates
+    downloadBtn.classList.remove("hidden");
+  }
+}
+
 function downloadRecommendationsAsPDF(recommendations, language = 'en') {
   if (!recommendations || !recommendations.candidates || recommendations.candidates.length === 0) {
     const message = language === 'ar' ? 'لا توجد توصيات للتحميل.' : 'No recommendations to download.';
@@ -206,8 +223,10 @@ function downloadRecommendationsAsPDF(recommendations, language = 'en') {
       </h2>
   `;
 
-  recommendations.candidates.forEach((candidate) => {
-    pdfHTML += '<div class="pdf-candidate-result">';
+  recommendations.candidates.forEach((candidate, index) => {
+    // Add page break before each candidate section except the first one
+    const pageBreakStyle = index > 0 ? 'style="page-break-before: always;"' : '';
+    pdfHTML += `<div class="pdf-candidate-result" ${pageBreakStyle}>`;
     
     if (candidate.cvName) {
       pdfHTML += `<div class="pdf-candidate-cv-name">${candidate.cvName}</div>`;
@@ -771,11 +790,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       currentLang
     );
     
-    // Show download button when recommendations are displayed
-    const downloadBtn = document.getElementById("download-recommendations-btn");
-    if (downloadBtn) {
-      downloadBtn.classList.remove("hidden");
-    }
+    // Update download button visibility based on recommendations
+    updateDownloadButtonVisibility(allRecommendations);
   }
 
   // Helper: rebuild a text blob from structured CV (fallback when raw text not present)
@@ -856,6 +872,9 @@ document.addEventListener("DOMContentLoaded", async () => {
           const allRecommendations = {
             candidates: Object.values(allRecommendationsMap)
           };
+          // Update lastRecommendations so PDF download reflects the change
+          lastRecommendations = allRecommendations;
+          saveLastRecommendations(allRecommendations);
           if (recommendationsContainer && resultsSection) {
             displayRecommendations(
               allRecommendations,
@@ -863,6 +882,8 @@ document.addEventListener("DOMContentLoaded", async () => {
               resultsSection,
               currentLang
             );
+            // Update download button visibility after deleting CV
+            updateDownloadButtonVisibility(allRecommendations);
           }
         }
         renderSubmittedCvBubbles(submittedCvData);
