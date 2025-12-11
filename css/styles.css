@@ -572,26 +572,31 @@ button:disabled { opacity:0.6; cursor:not-allowed; transform:none; }
 
 /* PDF-specific styles */
 .pdf-content {
-  padding: 40px;
+  padding: 50px;
   font-family: 'Roboto', sans-serif;
   color: #023B42;
+  line-height: 1.6;
+  max-width: 900px;
+  margin: 0 auto;
 }
 
 .pdf-header {
-  background: linear-gradient(90deg, #15878A, #007D89);
+  background: linear-gradient(135deg, #15878A 0%, #007D89 100%);
   color: white;
-  padding: 24px;
+  padding: 32px;
   border-radius: 12px;
-  margin-bottom: 32px;
+  margin-bottom: 40px;
+  box-shadow: 0 4px 12px rgba(21,135,138,0.2);
 }
 
 .pdf-header h1 {
   margin: 0;
-  font-size: 1.5rem;
+  font-size: 1.75rem;
   font-weight: 700;
   display: flex;
   align-items: center;
   gap: 12px;
+  letter-spacing: 0.5px;
 }
 
 .pdf-header .tagline {
@@ -602,21 +607,30 @@ button:disabled { opacity:0.6; cursor:not-allowed; transform:none; }
 }
 
 .pdf-title {
-  font-size: 1.25rem;
-  font-weight: 600;
-  margin: 0 0 24px 0;
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin: 0 0 32px 0;
   color: #15878A;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #e5e7eb;
 }
 
 .pdf-candidate-result {
-  padding: 16px 0;
+  padding: 20px;
   border-bottom: 1px solid rgba(0,0,0,0.06);
-  margin-bottom: 24px;
+  margin-bottom: 32px;
   page-break-inside: avoid;
   break-inside: avoid;
+  background: #fafbfc;
+  border-left: 3px solid #15878A;
+  border-radius: 4px;
+  margin-left: -50px;
+  margin-right: -50px;
+  padding-left: 50px;
+  padding-right: 50px;
 }
 
 .pdf-candidate-result:last-child {
@@ -625,44 +639,79 @@ button:disabled { opacity:0.6; cursor:not-allowed; transform:none; }
 
 .pdf-candidate-cv-name {
   color: #7E9196;
-  font-size: 0.9rem;
-  margin: 0 0 8px 0;
+  font-size: 0.85rem;
+  margin: 0 0 16px 0;
   font-weight: 400;
+  font-style: italic;
 }
 
 .pdf-candidate-name {
   color: #15878A;
-  font-size: 1.05rem;
-  margin: 0 0 12px 0;
-  font-weight: 600;
+  font-size: 1.2rem;
+  margin: 0 0 20px 0;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .pdf-recommendation-card {
-  background: #fbfbfc;
-  padding: 12px;
+  background: #ffffff;
+  padding: 16px 18px;
   border-left: 4px solid #CFB586;
   border-radius: 8px;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  border: 1px solid rgba(0,0,0,0.05);
 }
 
 .pdf-recommendation-title {
-  font-weight: 600;
-  font-size: 1rem;
-  margin: 0 0 8px 0;
-  color: #023B42;
+  font-weight: 700;
+  font-size: 1.05rem;
+  margin: 0 0 12px 0;
+  color: #15878A;
+  letter-spacing: 0.3px;
+  line-height: 1.4;
 }
 
 .pdf-recommendation-reason {
-  margin: 8px 0;
+  margin: 12px 0;
   color: #023B42;
-  line-height: 1.6;
+  line-height: 1.7;
+  font-size: 0.95rem;
 }
 
 .pdf-recommendation-rule {
-  margin-top: 8px;
-  font-size: 0.9rem;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(0,0,0,0.08);
+  font-size: 0.85rem;
+  color: #7E9196;
+  font-style: normal;
+}
+
+.pdf-candidate-result > p {
+  padding: 24px;
+  background: #f9fafb;
+  border: 2px dashed #e5e7eb;
+  border-radius: 8px;
+  text-align: center;
   color: #7E9196;
   font-style: italic;
+  margin: 20px 0;
+}
+
+.pdf-footer {
+  margin-top: 40px;
+  padding-top: 20px;
+  border-top: 2px solid #e5e7eb;
+  color: #7E9196;
+  font-size: 0.85rem;
+}
+
+.pdf-footer-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 /* === TYPING INDICATOR === */
