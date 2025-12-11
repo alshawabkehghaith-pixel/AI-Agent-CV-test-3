@@ -914,15 +914,32 @@ document.addEventListener("DOMContentLoaded", async () => {
       e.preventDefault();
       const container = document.getElementById("rules-container");
       if (container) {
-        const newInput = createRuleInput();
-        const statusOverlay = container.querySelector("#rules-status");
-        if (statusOverlay) {
-          container.insertBefore(newInput, statusOverlay);
+        // Check if there's already an empty rule input
+        const existingInputs = container.querySelectorAll(".rule-input");
+        let emptyInput = null;
+        
+        // Look for an empty input
+        existingInputs.forEach((input) => {
+          if (!input.value.trim() && !emptyInput) {
+            emptyInput = input;
+          }
+        });
+        
+        // If an empty input exists, focus on it instead of creating a new one
+        if (emptyInput) {
+          emptyInput.focus();
         } else {
-          container.appendChild(newInput);
+          // Only create a new input if all existing inputs have content
+          const newInput = createRuleInput();
+          const statusOverlay = container.querySelector("#rules-status");
+          if (statusOverlay) {
+            container.insertBefore(newInput, statusOverlay);
+          } else {
+            container.appendChild(newInput);
+          }
+          const input = newInput.querySelector('input');
+          if (input) input.focus();
         }
-        const input = newInput.querySelector('input');
-        if (input) input.focus();
       }
     });
   }
