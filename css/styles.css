@@ -615,6 +615,8 @@ button:disabled { opacity:0.6; cursor:not-allowed; transform:none; }
   padding: 16px 0;
   border-bottom: 1px solid rgba(0,0,0,0.06);
   margin-bottom: 24px;
+  page-break-inside: avoid;
+  break-inside: avoid;
 }
 
 .pdf-candidate-result:last-child {
