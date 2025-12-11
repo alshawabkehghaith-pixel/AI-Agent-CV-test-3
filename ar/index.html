@@ -120,12 +120,18 @@
     <section class="results-section hidden" id="results-section">
       <h2><i class="fas fa-star"></i> التوصيات</h2>
       <div id="recommendations-container"></div>
+      <button id="download-recommendations-btn" class="download-btn hidden">
+        <i class="fas fa-download"></i> تحميل التوصيات (PDF)
+      </button>
     </section>
   </main>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  
+  <!-- html2pdf.js for PDF generation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
   <script src="../config.js"></script>
 
