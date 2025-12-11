@@ -6,6 +6,7 @@ import {
   DEFAULT_RULES_EN,
   DEFAULT_RULES_AR,
   getDefaultRules,
+  getFinalCertificateCatalog,
 } from "./constants.js";
 
 import {
@@ -173,6 +174,117 @@ function removeEmptyRuleInputs() {
         wrapper.remove();
       }
     }
+  });
+}
+
+function downloadRecommendationsAsPDF(recommendations, language = 'en') {
+  if (!recommendations || !recommendations.candidates || recommendations.candidates.length === 0) {
+    const message = language === 'ar' ? 'لا توجد توصيات للتحميل.' : 'No recommendations to download.';
+    alert(message);
+    return;
+  }
+
+  const catalog = getFinalCertificateCatalog();
+  
+  // Create PDF content with proper header text based on language
+  const headerText = language === 'ar' 
+    ? 'توصيات التدريب والشهادات المدعومة بالذكاء الاصطناعي'
+    : 'AI-powered training and certification recommendations';
+  const titleText = language === 'ar' ? 'التوصيات' : 'Recommendations';
+  
+  let pdfHTML = `
+    <div class="pdf-content">
+      <div class="pdf-header">
+        <h1>
+          <i class="fas fa-user-graduate"></i> SkillMatch Pro
+        </h1>
+        <p class="tagline">${headerText}</p>
+      </div>
+      
+      <h2 class="pdf-title">
+        <i class="fas fa-star"></i> ${titleText}
+      </h2>
+  `;
+
+  recommendations.candidates.forEach((candidate) => {
+    pdfHTML += '<div class="pdf-candidate-result">';
+    
+    if (candidate.cvName) {
+      pdfHTML += `<div class="pdf-candidate-cv-name">${candidate.cvName}</div>`;
+    }
+    
+    const candidateName = candidate.candidateName || (language === 'ar' ? 'مرشح' : 'Candidate');
+    pdfHTML += `<div class="pdf-candidate-name">${candidateName}</div>`;
+    
+    if (candidate.recommendations && candidate.recommendations.length > 0) {
+      candidate.recommendations.forEach((rec) => {
+        let displayName = rec.certName;
+        if (language === 'ar') {
+          const found = catalog.find(c => c.name === rec.certName || c.Certificate_Name_EN === rec.certName);
+          if (found && found.nameAr) displayName = found.nameAr;
+        }
+        
+        const rulesAppliedText = language === 'ar' ? 'القواعد المطبقة:' : 'Rules Applied:';
+        
+        pdfHTML += `
+          <div class="pdf-recommendation-card">
+            <div class="pdf-recommendation-title">${displayName}</div>
+            <div class="pdf-recommendation-reason">
+              <i class="fas fa-lightbulb"></i> ${rec.reason}
+            </div>
+            ${rec.rulesApplied && rec.rulesApplied.length > 0 
+              ? `<div class="pdf-recommendation-rule">
+                  <i class="fas fa-gavel"></i> ${rulesAppliedText} ${rec.rulesApplied.join(", ")}
+                </div>`
+              : ''
+            }
+          </div>
+        `;
+      });
+    } else {
+      const noRecText = language === 'ar' 
+        ? 'لم يتم العثور على توصيات محددة لهذا المرشح بناءً على القواعد والكتالوج الحالي.'
+        : 'No specific recommendations found for this candidate based on the current rules and catalog.';
+      pdfHTML += `<p>${noRecText}</p>`;
+    }
+    
+    pdfHTML += '</div>';
+  });
+  
+  pdfHTML += '</div>';
+  
+  // Create a temporary container
+  const tempDiv = document.createElement('div');
+  tempDiv.innerHTML = pdfHTML;
+  tempDiv.style.position = 'absolute';
+  tempDiv.style.left = '-9999px';
+  document.body.appendChild(tempDiv);
+  
+  // Get the element to convert
+  const element = tempDiv.firstElementChild;
+  
+  // PDF options
+  const filename = language === 'ar' ? 'توصيات_SkillMatch.pdf' : 'SkillMatch_Recommendations.pdf';
+  const opt = {
+    margin: [10, 10, 10, 10],
+    filename: filename,
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { 
+      scale: 2,
+      useCORS: true,
+      logging: false
+    },
+    jsPDF: { 
+      unit: 'mm', 
+      format: 'a4', 
+      orientation: 'portrait' 
+    }
+  };
+  
+  // Generate and download PDF
+  html2pdf().set(opt).from(element).save().then(() => {
+    // Clean up
+    document.body.removeChild(tempDiv);
   });
 }
 
@@ -658,6 +770,12 @@ document.addEventListener("DOMContentLoaded", async () => {
       resultsSection,
       currentLang
     );
+    
+    // Show download button when recommendations are displayed
+    const downloadBtn = document.getElementById("download-recommendations-btn");
+    if (downloadBtn) {
+      downloadBtn.classList.remove("hidden");
+    }
   }
 
   // Helper: rebuild a text blob from structured CV (fallback when raw text not present)
@@ -1167,6 +1285,16 @@ document.addEventListener("DOMContentLoaded", async () => {
         );
       } finally {
         setButtonLoading(generateBtn, false);
+      }
+    });
+  }
+
+  // Download Recommendations button
+  const downloadBtn = document.getElementById("download-recommendations-btn");
+  if (downloadBtn) {
+    downloadBtn.addEventListener("click", () => {
+      if (lastRecommendations) {
+        downloadRecommendationsAsPDF(lastRecommendations, currentLang);
       }
     });
   }
